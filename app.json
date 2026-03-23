@@ -1,7 +1,7 @@
 {
-  "name": "ithappenedtome",
-  "slug": "ithappenedtome",
-  "scheme": "ithappenedtome",
+  "name": "itcanhappentoyou",
+  "slug": "itcanhappentoyou",
+  "scheme": "itcanhappentoyou",
   "version": "1.0.0",
   "orientation": "portrait",
   "userInterfaceStyle": "automatic",
@@ -16,7 +16,7 @@
   ],
   "android": {
     "icon": "./assets/images/app-icon-android-legacy.png",
-    "package": "com.ithappenedtome",
+    "package": "com.itcanhappentoyou",
     "adaptiveIcon": {
       "foregroundImage": "./assets/images/app-icon-android-adaptive-foreground.png",
       "backgroundImage": "./assets/images/app-icon-android-adaptive-background.png"
@@ -27,7 +27,7 @@
   "ios": {
     "icon": "./assets/images/app-icon-ios.png",
     "supportsTablet": true,
-    "bundleIdentifier": "com.ithappenedtome"
+    "bundleIdentifier": "com.itcanhappentoyou"
   },
   "web": {
     "favicon": "./assets/images/app-icon-web-favicon.png",
@@ -62,6 +62,55 @@
   "extra": {
     "ignite": {
       "version": "11.4.0"
+    }
+  },
+  "expo": {
+    "ios": {
+      "privacyManifests": {
+        "NSPrivacyAccessedAPITypes": [
+          {
+            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategoryUserDefaults",
+            "NSPrivacyAccessedAPITypeReasons": [
+              "CA92.1"
+            ]
+          }
+        ]
+      },
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "This app uses your location to provide location-based services.",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "This app uses your location to provide location-based services.",
+        "NSLocationAlwaysUsageDescription": "This app uses your location to provide location-based services."
+      },
+      "bundleIdentifier": "com.anonymous.itcanhappentoyou"
+    },
+    "plugins": [
+      [
+        "react-native-maps",
+        {
+          "androidGoogleMapsApiKey": "the key",
+          "iosGoogleMapsApiKey": "the key"
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "This app uses your location to provide location-based services.",
+          "locationAlwaysPermission": "This app uses your location to provide location-based services.",
+          "locationWhenInUsePermission": "This app uses your location to provide location-based services.",
+          "isIosBackgroundLocationEnabled": true,
+          "isAndroidBackgroundLocationEnabled": true
+        }
+      ]
+    ],
+    "android": {
+      "permissions": [
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_BACKGROUND_LOCATION",
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.FOREGROUND_SERVICE_LOCATION"
+      ],
+      "package": "com.anonymous.itcanhappentoyou"
     }
   }
 }

@@ -3,16 +3,16 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 
 import { Icon } from "@/components/Icon"
-import { EpisodeProvider } from "@/context/EpisodeContext"
 import { translate } from "@/i18n/translate"
-import { DemoCommunityScreen } from "@/screens/DemoCommunityScreen"
 import { DemoDebugScreen } from "@/screens/DemoDebugScreen"
-import { DemoPodcastListScreen } from "@/screens/DemoPodcastListScreen"
-import { DemoShowroomScreen } from "@/screens/DemoShowroomScreen/DemoShowroomScreen"
 import { useAppTheme } from "@/theme/context"
 import type { ThemedStyle } from "@/theme/types"
 
 import type { DemoTabParamList } from "./navigationTypes"
+import IncidentMapScreen from "@/screens/IncidentMapScreen"
+import { ReportIncidentScreen } from "@/screens/ReportIncidentScreen"
+import { UserLocationProvider } from "@/context/LocationContext"
+import { IncidentProvider } from "@/context/IncidentContext"
 
 const Tab = createBottomTabNavigator<DemoTabParamList>()
 
@@ -31,7 +31,8 @@ export function DemoNavigator() {
   } = useAppTheme()
 
   return (
-    <EpisodeProvider>
+    <UserLocationProvider>
+      <IncidentProvider>
       <Tab.Navigator
         screenOptions={{
           headerShown: false,
@@ -44,13 +45,13 @@ export function DemoNavigator() {
         }}
       >
         <Tab.Screen
-          name="DemoShowroom"
-          component={DemoShowroomScreen}
+          name="IncidentMap"
+          component={IncidentMapScreen}
           options={{
-            tabBarLabel: translate("demoNavigator:componentsTab"),
+            tabBarLabel: translate("demoNavigator:incidentTab"),
             tabBarIcon: ({ focused }) => (
               <Icon
-                icon="components"
+                icon="view"
                 color={focused ? colors.tint : colors.tintInactive}
                 size={30}
               />
@@ -59,28 +60,16 @@ export function DemoNavigator() {
         />
 
         <Tab.Screen
-          name="DemoCommunity"
-          component={DemoCommunityScreen}
+          name="ReportIncident"
+          component={ReportIncidentScreen}
           options={{
-            tabBarLabel: translate("demoNavigator:communityTab"),
+            tabBarLabel: translate("demoNavigator:reportTab"),
             tabBarIcon: ({ focused }) => (
               <Icon
-                icon="community"
+                icon="ladybug"
                 color={focused ? colors.tint : colors.tintInactive}
                 size={30}
               />
-            ),
-          }}
-        />
-
-        <Tab.Screen
-          name="DemoPodcastList"
-          component={DemoPodcastListScreen}
-          options={{
-            tabBarAccessibilityLabel: translate("demoNavigator:podcastListTab"),
-            tabBarLabel: translate("demoNavigator:podcastListTab"),
-            tabBarIcon: ({ focused }) => (
-              <Icon icon="podcast" color={focused ? colors.tint : colors.tintInactive} size={30} />
             ),
           }}
         />
@@ -96,7 +85,8 @@ export function DemoNavigator() {
           }}
         />
       </Tab.Navigator>
-    </EpisodeProvider>
+    </IncidentProvider>
+    </UserLocationProvider>
   )
 }
 

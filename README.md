@@ -1,77 +1,129 @@
-# Welcome to your new ignited app!
+# It Can Happen To You
 
-> The latest and greatest boilerplate for Infinite Red opinions
+A travel safety app that displays real crime and incident data on an interactive map. Built with React Native (Expo) and backed by a Node.js/Express server that pulls data from the SF Gov open data API and uses AI to categorize incidents.
 
-This is the boilerplate that [Infinite Red](https://infinite.red) uses as a way to test bleeding-edge changes to our React Native stack.
+## Features
 
-- [Quick start documentation](https://github.com/infinitered/ignite/blob/master/docs/boilerplate/Boilerplate.md)
-- [Full documentation](https://github.com/infinitered/ignite/blob/master/docs/README.md)
+- **Interactive incident map** — browse nearby crime/incident reports plotted on a map with category-based icons (theft, assault, fraud, scams, etc.)
+- **Filter by category** — narrow the map to specific incident types using a dropdown filter
+- **Report incidents** — submit your own incident reports, which are AI-categorized and stored in the database
+- **Live location tracking** — uses device GPS to center the map on your current location
+- **Multi-language support** — available in English, Spanish, French, Arabic, Hindi, Japanese, and Korean
+- **Light/dark theme** — automatic theme switching based on system preferences
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Mobile app | React Native 0.81, Expo SDK 54, React 19, TypeScript |
+| Navigation | React Navigation v7 (native stack + bottom tabs) |
+| Maps | react-native-maps |
+| Backend | Express, Prisma (SQLite), TypeScript |
+| AI categorization | Claude (Anthropic) or Gemini (Google) |
+| Data source | [SF Gov Socrata API](https://data.sfgov.org) — last 30 days of crime data |
+| Boilerplate | [Ignite 11.4.0](https://github.com/infinitered/ignite) by Infinite Red |
 
 ## Getting Started
 
+### Prerequisites
+
+- Node.js >= 20
+- iOS Simulator / Android Emulator or a physical device
+- [EAS CLI](https://docs.expo.dev/eas/) for building dev clients
+
+### Mobile App
+
 ```bash
+# Install dependencies (legacy peer deps flag is required)
 npm install --legacy-peer-deps
+
+# Start the Expo dev server
 npm run start
+
+# Run on a specific platform
+npm run ios
+npm run android
 ```
 
-To make things work on your local simulator, or on your phone, you need first to [run `eas build`](https://github.com/infinitered/ignite/blob/master/docs/expo/EAS.md). We have many shortcuts on `package.json` to make it easier:
+To run on a simulator or device you first need to build a dev client:
 
 ```bash
-npm run build:ios:sim # build for ios simulator
-npm run build:ios:device # build for ios device
-npm run build:ios:prod # build for ios device
+npm run build:ios:sim       # iOS simulator
+npm run build:ios:device    # iOS device
+npm run build:android:sim   # Android emulator
+npm run build:android:device # Android device
 ```
 
-### `./assets`
+### Backend Server
 
-This directory is designed to organize and store various assets, making it easy for you to manage and use them in your application. The assets are further categorized into subdirectories, including `icons` and `images`:
+```bash
+cd server
 
-```tree
-assets
-├── icons
-└── images
+# Install dependencies
+npm install
+
+# Generate Prisma client
+npm run db:generate
+
+# Run database migrations
+npm run db:migrate
+
+# Start the dev server (port 3000)
+npm run dev
+
+# Start with data seeding from SF Gov API
+npm run dev -- --seed
 ```
 
-**icons**
-This is where your icon assets will live. These icons can be used for buttons, navigation elements, or any other UI components. The recommended format for icons is PNG, but other formats can be used as well.
+#### Environment Variables
 
-Ignite comes with a built-in `Icon` component. You can find detailed usage instructions in the [docs](https://github.com/infinitered/ignite/blob/master/docs/boilerplate/app/components/Icon.md).
+| Variable | Description |
+|----------|-------------|
+| `PORT` | Server port (default: `3000`) |
+| `AI_PROVIDER` | `gemini` (default) or `claude` / `anthropic` |
+| `GEMINI_API_KEY` | Google Gemini API key (used for incident categorization) |
+| `ANTHROPIC_API_KEY` | Anthropic API key (if using Claude as AI provider) |
 
-**images**
-This is where your images will live, such as background images, logos, or any other graphics. You can use various formats such as PNG, JPEG, or GIF for your images.
+If no API key is set, the server falls back to keyword-based categorization.
 
-Another valuable built-in component within Ignite is the `AutoImage` component. You can find detailed usage instructions in the [docs](https://github.com/infinitered/ignite/blob/master/docs/Components-AutoImage.md).
+### API Endpoints
 
-How to use your `icon` or `image` assets:
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/incidents?latitude=X&longitude=Y` | Fetch incidents within ~50 km² of the given coordinates |
+| `POST` | `/api/incident` | Submit a user-reported incident (`{ latitude, longitude, description }`) |
 
-```typescript
-import { Image } from 'react-native';
+## Project Structure
 
-const MyComponent = () => {
-  return (
-    <Image source={require('assets/images/my_image.png')} />
-  );
-};
+```
+app/
+├── components/       # Reusable UI components (Ignite library)
+├── context/          # React context providers (Auth, Location, Incidents)
+├── i18n/             # Internationalization files
+├── navigators/       # React Navigation setup
+├── screens/          # App screens
+│   ├── IncidentMapScreen.tsx      # Main map view with incident markers
+│   ├── ReportIncidentScreen.tsx   # User incident submission form
+│   ├── LoginScreen.tsx            # Authentication
+│   └── WelcomeScreen.tsx          # Landing screen
+├── services/api/     # API client (apisauce)
+└── theme/            # Light/dark theme tokens and utilities
+server/
+├── src/
+│   ├── index.ts          # Express server, API routes, DB seeding
+│   ├── fetchIncidents.ts # SF Gov API data fetcher
+│   └── categorize.ts     # AI-powered incident categorization
+└── prisma/
+    └── schema.prisma     # Database schema (SQLite)
 ```
 
-## Running Maestro end-to-end tests
+## Scripts
 
-Follow our [Maestro Setup](https://ignitecookbook.com/docs/recipes/MaestroSetup) recipe.
-
-## Next Steps
-
-### Ignite Cookbook
-
-[Ignite Cookbook](https://ignitecookbook.com/) is an easy way for developers to browse and share code snippets (or “recipes”) that actually work.
-
-### Upgrade Ignite boilerplate
-
-Read our [Upgrade Guide](https://ignitecookbook.com/docs/recipes/UpdatingIgnite) to learn how to upgrade your Ignite project.
-
-## Community
-
-⭐️ Help us out by [starring on GitHub](https://github.com/infinitered/ignite), filing bug reports in [issues](https://github.com/infinitered/ignite/issues) or [ask questions](https://github.com/infinitered/ignite/discussions).
-
-💬 Join us on [Slack](https://join.slack.com/t/infiniteredcommunity/shared_invite/zt-1f137np4h-zPTq_CbaRFUOR_glUFs2UA) to discuss.
-
-📰 Make our Editor-in-chief happy by [reading the React Native Newsletter](https://reactnativenewsletter.com/).
+| Command | Description |
+|---------|-------------|
+| `npm run start` | Start Expo dev server |
+| `npm run ios` / `npm run android` | Run on platform |
+| `npm run compile` | TypeScript type check |
+| `npm run lint` | ESLint with auto-fix |
+| `npm test` | Run Jest tests |
+| `npm run prebuild:clean` | Clean Expo prebuild |

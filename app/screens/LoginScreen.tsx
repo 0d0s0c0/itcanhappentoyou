@@ -31,8 +31,8 @@ export const LoginScreen: FC<LoginScreenProps> = () => {
   useEffect(() => {
     // Here is where you could fetch credentials from keychain or storage
     // and pre-fill the form fields.
-    setAuthEmail("ignite@infinite.red")
-    setAuthPassword("ign1teIsAwes0m3")
+    setAuthEmail("myEmail@example.com")
+    setAuthPassword("myPasswordIsAwes0m3")
   }, [setAuthEmail])
 
   const error = isSubmitted ? validationError : ""

@@ -8,10 +8,10 @@
 import { ApiResponse, ApisauceInstance, create } from "apisauce"
 
 import Config from "@/config"
-import type { EpisodeItem } from "@/services/api/types"
+import type { Incident } from "@/services/api/types"
 
 import { GeneralApiProblem, getGeneralApiProblem } from "./apiProblem"
-import type { ApiConfig, ApiFeedResponse } from "./types"
+import type { ApiConfig } from "./types"
 
 /**
  * Configuring the apisauce instance.
@@ -43,32 +43,72 @@ export class Api {
     })
   }
 
-  /**
-   * Gets a list of recent React Native Radio episodes.
-   */
-  async getEpisodes(): Promise<{ kind: "ok"; episodes: EpisodeItem[] } | GeneralApiProblem> {
-    // make the api call
-    const response: ApiResponse<ApiFeedResponse> = await this.apisauce.get(
-      `api.json?rss_url=https%3A%2F%2Ffeeds.simplecast.com%2FhEI_f9Dx`,
-    )
+  async getIncidents(
+    latitude: number,
+    longitude: number,
+  ): Promise<{ kind: "ok"; incidents: Incident[] } | GeneralApiProblem> {
+    const response: ApiResponse<{ count: number; incidents: Incident[] }> =
+      await this.apisauce.get("/api/incidents", { latitude, longitude })
 
-    // the typical ways to die when calling an api
     if (!response.ok) {
       const problem = getGeneralApiProblem(response)
       if (problem) return problem
     }
 
-    // transform the data into the format we are expecting
     try {
-      const rawData = response.data
+      const iconMap: Record<string, ReturnType<typeof require>> = {
+        theft: require("../../../assets/images/theft.png"),
+        assault: require("../../../assets/images/assault.png"),
+        "sex-related": require("../../../assets/images/exposure.png"),
+        scam: require("../../../assets/images/taxiscam.png"),
+        uncategorized: require("../../../assets/images/uncategorized.png"),
+      }
 
-      // This is where we transform the data into the shape we expect for our model.
-      const episodes: EpisodeItem[] =
-        rawData?.items.map((raw) => ({
+      const incidents: Incident[] =
+        response.data?.incidents.map((raw) => ({
           ...raw,
+          icon: iconMap[raw.category] || iconMap.uncategorized,
         })) ?? []
 
-      return { kind: "ok", episodes }
+      return { kind: "ok", incidents }
+    } catch (e) {
+      if (__DEV__ && e instanceof Error) {
+        console.error(`Bad data: ${e.message}\n${response.data}`, e.stack)
+      }
+      return { kind: "bad-data" }
+    }
+  }
+  async reportIncident(
+    latitude: number,
+    longitude: number,
+    description: string,
+  ): Promise<{ kind: "ok"; incident: Incident } | GeneralApiProblem> {
+    const response: ApiResponse<{ incident: Incident }> = await this.apisauce.post(
+      "/api/incident",
+      { latitude, longitude, description },
+    )
+
+    if (!response.ok) {
+      const problem = getGeneralApiProblem(response)
+      if (problem) return problem
+    }
+
+    try {
+      const iconMap: Record<string, ReturnType<typeof require>> = {
+        theft: require("../../../assets/images/theft.png"),
+        assault: require("../../../assets/images/assault.png"),
+        "sex-related": require("../../../assets/images/exposure.png"),
+        scam: require("../../../assets/images/taxiscam.png"),
+        uncategorized: require("../../../assets/images/uncategorized.png"),
+      }
+
+      const raw = response.data!.incident
+      const incident: Incident = {
+        ...raw,
+        icon: iconMap[raw.category] || iconMap.uncategorized,
+      }
+
+      return { kind: "ok", incident }
     } catch (e) {
       if (__DEV__ && e instanceof Error) {
         console.error(`Bad data: ${e.message}\n${response.data}`, e.stack)
