@@ -90,3 +90,13 @@ web-build/
 # Dependency Graph Visualizations
 app-dependency-graph.svg
 app-dependency-graph.png
+# ── Secrets — never commit ───────────────────────────────────
+# The server reads ANTHROPIC_API_KEY / GEMINI_API_KEY from .env.
+# A published API key is typically found and used within minutes.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.keystore
